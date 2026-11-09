@@ -1,0 +1,58 @@
+IF OBJECT_ID(N'dbo.enforcement_executions', N'U') IS NULL
+BEGIN
+    CREATE TABLE dbo.enforcement_executions (
+        id bigint IDENTITY(1,1) NOT NULL,
+        source_key nvarchar(150) NOT NULL,
+        source_hash char(64) NOT NULL,
+        import_batch_id uniqueidentifier NOT NULL,
+        source_row_number int NOT NULL,
+        fiscal_year int NOT NULL,
+        currency char(3) NOT NULL CONSTRAINT DF_enforcement_executions_currency DEFAULT ('MKD'),
+        coding_block_original nvarchar(250) NULL,
+        extracted_budget_code nvarchar(120) NOT NULL,
+        budget_line_id bigint NOT NULL,
+        document_type nvarchar(100) NULL,
+        document_date date NOT NULL,
+        beneficiary nvarchar(500) NULL,
+        subledger_type nvarchar(150) NULL,
+        obligation_reference nvarchar(150) NULL,
+        period_label nvarchar(50) NULL,
+        journal_voucher_number nvarchar(120) NOT NULL,
+        origin nvarchar(120) NULL,
+        source_document_number nvarchar(120) NULL,
+        journal_classification nvarchar(200) NULL,
+        description nvarchar(2000) NULL,
+        debit_amount decimal(19,4) NOT NULL CONSTRAINT DF_enforcement_executions_debit DEFAULT (0),
+        credit_amount decimal(19,4) NOT NULL CONSTRAINT DF_enforcement_executions_credit DEFAULT (0),
+        net_amount AS (debit_amount-credit_amount) PERSISTED,
+        principal_amount decimal(19,4) NOT NULL CONSTRAINT DF_enforcement_executions_principal DEFAULT (0),
+        fine_amount decimal(19,4) NOT NULL CONSTRAINT DF_enforcement_executions_fine DEFAULT (0),
+        court_fee_amount decimal(19,4) NOT NULL CONSTRAINT DF_enforcement_executions_court_fee DEFAULT (0),
+        interest_amount decimal(19,4) NOT NULL CONSTRAINT DF_enforcement_executions_interest DEFAULT (0),
+        classification_status nvarchar(30) NOT NULL CONSTRAINT DF_enforcement_executions_classification_status DEFAULT (N'unclassified'),
+        procurement_project_id bigint NULL,
+        financial_reviewed_by bigint NULL,
+        financial_reviewed_at datetime2 NULL,
+        legal_classified_by bigint NULL,
+        legal_classified_at datetime2 NULL,
+        created_at datetime2 NOT NULL CONSTRAINT DF_enforcement_executions_created_at DEFAULT (SYSUTCDATETIME()),
+        updated_at datetime2 NOT NULL CONSTRAINT DF_enforcement_executions_updated_at DEFAULT (SYSUTCDATETIME()),
+        row_version rowversion NOT NULL,
+        CONSTRAINT PK_enforcement_executions PRIMARY KEY (id),
+        CONSTRAINT UQ_enforcement_executions_source_key UNIQUE (source_key),
+        CONSTRAINT FK_enforcement_executions_batch FOREIGN KEY (import_batch_id) REFERENCES dbo.import_batches(id),
+        CONSTRAINT FK_enforcement_executions_budget_line FOREIGN KEY (budget_line_id) REFERENCES dbo.budget_lines(id),
+        CONSTRAINT FK_enforcement_executions_procurement FOREIGN KEY (procurement_project_id) REFERENCES dbo.procurement_projects(id),
+        CONSTRAINT FK_enforcement_executions_financial_user FOREIGN KEY (financial_reviewed_by) REFERENCES dbo.users(id),
+        CONSTRAINT FK_enforcement_executions_legal_user FOREIGN KEY (legal_classified_by) REFERENCES dbo.users(id),
+        CONSTRAINT CK_enforcement_executions_year CHECK (fiscal_year BETWEEN 2020 AND 2100),
+        CONSTRAINT CK_enforcement_executions_source_row CHECK (source_row_number > 0),
+        CONSTRAINT CK_enforcement_executions_amounts CHECK (debit_amount >= 0 AND credit_amount >= 0 AND (debit_amount > 0 OR credit_amount > 0)),
+        CONSTRAINT CK_enforcement_executions_components CHECK (principal_amount >= 0 AND fine_amount >= 0 AND court_fee_amount >= 0 AND interest_amount >= 0),
+        CONSTRAINT CK_enforcement_executions_classification CHECK (classification_status IN (N'unclassified',N'partial',N'classified',N'needs_reclassification'))
+    );
+    CREATE INDEX IX_enforcement_executions_budget ON dbo.enforcement_executions(budget_line_id,fiscal_year,document_date);
+    CREATE INDEX IX_enforcement_executions_procurement ON dbo.enforcement_executions(procurement_project_id) WHERE procurement_project_id IS NOT NULL;
+    CREATE INDEX IX_enforcement_executions_journal ON dbo.enforcement_executions(journal_voucher_number,source_document_number);
+END;
+GO

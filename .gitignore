@@ -1,0 +1,29 @@
+# е-Кабинет · Општина Битола
+.DS_Store
+Thumbs.db
+*.log
+.env
+.env.*
+!.env.example
+!php81/.env.example
+/.idea
+/.vscode
+/.cursor/
+/.zed
+/vendor
+/node_modules
+
+# Приватна конфигурација, тајни и пакети за распоредување никогаш не се верзионираат
+**/config/e-kabineti.php
+**/shared/e-kabineti.php
+*.pem
+*.key
+/dist/
+/.tmp/
+
+# Работни податоци на апликацијата (документи, логови, заклучувања)
+/php81/storage/logs/*
+!/php81/storage/logs/.gitkeep
+/php81/storage/private/*
+!/php81/storage/private/.gitkeep
+/php81/storage/*.lock

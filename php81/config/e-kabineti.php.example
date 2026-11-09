@@ -1,0 +1,78 @@
+<?php
+
+/*
+ * е-Кабинет · Општина Битола — приватна конфигурација (пример).
+ *
+ * Копирајте ја оваа датотека во приватна локација надвор од document root (на пр. /var/www/ekabineti-bitola/shared/e-kabineti.php)
+ * и поставете ја променливата EKABINETI_CONFIG да покажува кон неа. Никогаш не ја ставајте вистинската конфигурација во Git.
+ * Сите вредности „REPLACE_ME“ / „bitola.example“ се примери: внесете ги податоците на Општина Битола.
+ * Целосното упатство: docs/ИНСТАЛАЦИЈА.md.
+ */
+return [
+    'app' => [
+        'env' => 'production',
+        // Јавна HTTPS адреса на апликацијата (на пр. https://ekabinet.bitola.gov.mk).
+        'url' => 'https://ekabinet.bitola.example',
+        'timezone' => 'Europe/Skopje',
+        'session_name' => 'ekabinet_bitola_session',
+        // Долга случајна вредност (најмалку 32 знаци): php -r "echo bin2hex(random_bytes(32)), PHP_EOL;"
+        'health_token' => 'REPLACE_WITH_A_LONG_RANDOM_VALUE',
+        // IP-адреси на reverse proxy / load balancer чиј X-Forwarded-For се смета за доверлив (IP во ревизијата).
+        'trusted_proxies' => [],
+    ],
+    'database' => [
+        // SQL Server 2019+ (или Azure SQL). Базата се создава со македонска кириличка колација.
+        'host' => 'sql.bitola.example',
+        'port' => 1433,
+        'name' => 'ekabineti_bitola',
+        'collation' => 'Macedonian_FYROM_100_CI_AS',
+        'username' => 'ekabineti_bitola_app',
+        'password' => 'REPLACE_ME',
+        'encrypt' => true,
+        'trust_server_certificate' => false, // во продукција false; инсталирајте сертификат валиден за hostname_in_certificate
+        'hostname_in_certificate' => 'sql.bitola.example',
+        'login_timeout' => 15,
+    ],
+    'graph' => [
+        // Microsoft Graph (Entra ID апликација на Општина Битола) за известувања по е-пошта.
+        // Дозвола: Mail.Send (Application), ограничена со Application Access Policy на сандачето на испраќачот.
+        'enabled' => false,
+        'tenant_id' => 'REPLACE_ME',
+        'client_id' => 'REPLACE_ME',
+        'client_secret' => 'REPLACE_ME',
+        'sender' => 'ekabinet@bitola.example',
+        'timeout' => 20,
+    ],
+    'google_sheets' => [
+        // Опционален панел на Градоначалникот во Google Sheets (табела на Општина Битола со листовите:
+        // Панел, Проекти, Услуги, Буџет, Прашања, Јавни набавки, Правни предмети, Услуги по сектори).
+        'enabled' => in_array(strtolower((string) (getenv('GOOGLE_SHEETS_SYNC_ENABLED') ?: 'false')), ['1', 'true', 'yes', 'on'], true),
+        'spreadsheet_id' => (string) (getenv('GOOGLE_SHEETS_SPREADSHEET_ID') ?: ''),
+        'dashboard_gid' => (string) (getenv('GOOGLE_SHEETS_DASHBOARD_GID') ?: '0'),
+        // JSON текст / читлива JSON патека, или GOOGLE_APPLICATION_CREDENTIALS (сервисна сметка на Општина Битола).
+        'credentials' => (string) (getenv('GOOGLE_SERVICE_ACCOUNT_CREDENTIALS') ?: ''),
+        'credentials_file' => (string) (getenv('GOOGLE_APPLICATION_CREDENTIALS') ?: ''),
+        'timezone' => (string) (getenv('GOOGLE_SHEETS_SYNC_TIMEZONE') ?: 'Europe/Skopje'),
+        'locale' => 'mk_MK',
+    ],
+    'openai' => [
+        // AI асистенти (извештаи, брифинзи, прикачување документи). Клучот се чува само во серверската средина.
+        'enabled' => in_array(strtolower((string) (getenv('OPENAI_ENABLED') ?: 'false')), ['1', 'true', 'yes', 'on'], true),
+        'api_key' => (string) (getenv('OPENAI_API_KEY') ?: ''),
+        'model' => (string) (getenv('OPENAI_MODEL') ?: 'gpt-5-mini'),
+        'timeout_seconds' => (int) (getenv('OPENAI_TIMEOUT_SECONDS') ?: 45),
+        'max_output_tokens' => (int) (getenv('OPENAI_MAX_OUTPUT_TOKENS') ?: 2500),
+    ],
+    'uploads' => [
+        'requested_max_mb' => 20,
+        // Патека до clamscan/clamdscan ако е инсталиран ClamAV; null кога нема антивирусно скенирање.
+        'clamav_binary' => null,
+        'allowed_mime_types' => [
+            'application/pdf',
+            'image/jpeg',
+            'image/png',
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'text/csv',
+        ],
+    ],
+];

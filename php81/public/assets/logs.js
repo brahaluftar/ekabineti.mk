@@ -1,0 +1,2 @@
+(()=>{const box=document.querySelector('#log-feed');if(!box)return;async function poll(){try{const r=await fetch('/system-logs/feed?cursor='+encodeURIComponent(box.dataset.cursor||''),{headers:{Accept:'application/json'},cache:'no-store'});if(!r.ok)return;const p=await r.json();box.dataset.cursor=p.cursor||box.dataset.cursor;if((p.data||[]).length)location.reload()}catch(e){}}setInterval(poll,5000)})();
+

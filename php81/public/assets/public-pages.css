@@ -1,0 +1,20 @@
+/* Public documents (terms, privacy) and standalone error pages — uses tokens from app.css. */
+.site-header { position: sticky; top: 0; z-index: 50; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--sp-3); padding: var(--sp-2) var(--sp-4); color: #fff; background: linear-gradient(120deg, var(--c-primary-800), var(--c-primary-700)); border-bottom: 3px solid var(--c-accent); }
+.site-header .brand img { width: 30px; height: auto; }
+.site-header .brand span { display: grid; line-height: 1.2; }
+.site-header .brand small { opacity: .85; font-size: var(--fs-xs); }
+.site-header nav { display: flex; flex-wrap: wrap; gap: var(--sp-1); }
+.site-header nav a { display: inline-flex; align-items: center; min-height: var(--tap); padding: 0 var(--sp-3); color: #fff; border-radius: var(--radius-md); font-weight: 600; text-decoration: none; }
+.site-header nav a:hover, .site-header nav .active { color: #fff; background: rgb(255 255 255 / 16%); }
+.page-shell { width: min(100% - 32px, 960px); margin: var(--sp-5) auto var(--sp-6); }
+.legal-document { padding: clamp(1rem, 4vw, 3rem); border: 1px solid var(--c-border); border-radius: var(--radius-lg); background: var(--c-surface); box-shadow: var(--shadow-1); }
+.legal-heading h1 { margin: var(--sp-1) 0 var(--sp-3); font-size: clamp(1.5rem, 4vw, 2.1rem); }
+.document-meta { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: var(--sp-3); margin: var(--sp-5) 0; }
+.document-meta div { padding: var(--sp-3); border-radius: var(--radius-sm); background: var(--c-surface-2); }
+.document-meta dt { color: var(--c-text-muted); font-size: var(--fs-xs); }
+.document-meta dd { margin: 2px 0 0; font-weight: 700; }
+.contents { padding: var(--sp-4) var(--sp-5); border-radius: var(--radius-md); background: var(--c-surface-2); }
+.legal-document section { scroll-margin-top: 80px; }
+.site-footer { width: min(100% - 32px, 960px); margin: 0 auto var(--sp-5); text-align: center; }
+.error-page { display: grid; gap: var(--sp-3); text-align: center; }
+.error-page h1 { margin: 0; font-size: 2.5rem; }

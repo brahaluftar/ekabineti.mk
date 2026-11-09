@@ -1,0 +1,7 @@
+# е-Кабинет · Општина Битола — распоредени задачи (копирајте во /etc/cron.d/ekabineti-bitola, сопственик root, дозволи 0644).
+# Распоредувач: потсетувања, сумарни е-пораки, неделни брифинзи, скенирање документи, увоз на приходи.
+*/5 * * * * www-data EKABINETI_CONFIG=/var/www/ekabineti-bitola/shared/e-kabineti.php /usr/bin/php /var/www/ekabineti-bitola/current/bin/scheduler.php >> /var/www/ekabineti-bitola/current/storage/logs/scheduler.log 2>&1
+# Испраќање на известувањата на чекање (почесто од распоредувачот).
+* * * * * www-data EKABINETI_CONFIG=/var/www/ekabineti-bitola/shared/e-kabineti.php /usr/bin/php /var/www/ekabineti-bitola/current/bin/process-notifications.php 25 >/dev/null 2>&1
+# Опционално: синхронизација на панелот на Градоначалникот во Google Sheets (само ако е вклучена).
+#15 * * * * www-data EKABINETI_CONFIG=/var/www/ekabineti-bitola/shared/e-kabineti.php /usr/bin/php /var/www/ekabineti-bitola/current/bin/sync-mayor-google-sheets.php >/dev/null 2>&1
